@@ -2,12 +2,17 @@
 #include <string>
 #include <windows.h>
 #include <vector>
+#include <map>
 
 using namespace std;
 
 enum Worlds { SADNESS, JOY, FEAR, CALM, ANGER, POWER }; // инициализирую миры, name
+enum class Emotion { Sadness, Joy, Fear, Calm, Anger, Power };
+
 string Emotion_Names[6] = { "Грусть", "Радость", "Страх", "Спокойствие", "Гнев", "Сила" };
 string Worlds_Names[6] = { "Мир Грусти", "Мир Радости", "Мир Страха", "Мир Спокойствия", "Мир Гнева", "Мир Силы" };
+map<Emotion, int> emotionValues;
+
 
 struct info {
     
@@ -54,11 +59,14 @@ struct Player {
 	string Name;
 	int Current_loc = SADNESS;
     int Emotions[6] = { 50, 50, 50, 50, 50, 50 };
-
+    map<Emotion, int> emotionValues;
 };
  
-
 Player Hero;
+
+
+
+
 
 //NPC Characters[3] = {
 //		   {"Эла", {
@@ -96,13 +104,48 @@ Player Hero;
 
 void Init_Game() {
 
-    NPC Ela("PORNO");
+  /*  NPC Ela("PORNO");
     Ela.text("BLADIMIR PUTIN MOLODEC", 100, 50, 100, 99, 90, 99);
-    Ela.Info();
+    Ela.Info();*/
+
+    emotionValues[Emotion::Sadness] = 50;
+    emotionValues[Emotion::Joy] = 50;
 
 }
 
-//void Start_Game() {
+void Start_Game() {
+
+    bool start = true;
+
+    while (start) {
+    
+        int temp;
+
+        cout << "Сосал? (выбери 1 или 2, 3 - вывод шкал эмоций)" << endl;
+        cout << "1) Да" << endl;
+        cout << "2) Нет" << endl;
+        cin >> temp;
+
+        if (temp > 0 || temp < 3) {
+
+            switch (temp) {
+            case(1):
+                emotionValues[Emotion::Sadness] += 10;
+                break;
+            case(2): 
+                emotionValues[Emotion::Joy] -= 10;
+                break;
+            case(3):
+                for (int i = 0; i < Hero.emotionValues.size(); i++) {
+                    cout << Emotion_Names[i] << Hero.emotionValues[i] << endl;
+                }
+                break;
+            }
+        }
+    }
+}
+
+
 //
 //    bool start = true;
 //	int round = 0;
@@ -167,13 +210,13 @@ void Init_Game() {
 //
 //        round++;
 //	}
-//}
+
 
 int main() {
 	setlocale(LC_ALL, "RU");
 	SetConsoleCP(1251); 
 	SetConsoleOutputCP(1251); 
 	Init_Game();
-	//Start_Game();
+	Start_Game();
 
 }
