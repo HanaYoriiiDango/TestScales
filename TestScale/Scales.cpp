@@ -130,15 +130,14 @@ void Start_Game() {
 
             switch (temp) {
             case(1):
-                emotionValues[Emotion::Sadness] += 10;
+                emotionValues[Emotion::Sadness] += 10; //??????????????????????
                 break;
             case(2): 
                 emotionValues[Emotion::Joy] -= 10;
                 break;
             case(3):
-                for (int i = 0; i < Hero.emotionValues.size(); i++) {
-                    cout << Emotion_Names[i] << Hero.emotionValues[i] << endl;
-                }
+                cout << Emotion_Names[0] << ": " << emotionValues[Emotion::Sadness] << endl;
+                cout << Emotion_Names[1] << ": " << emotionValues[Emotion::Joy] << endl;
                 break;
             }
         }
