@@ -1,221 +1,323 @@
-﻿#include <iostream>
+﻿//```cpp
+
+// Здесь я объявляю все библиотеки и пространство имен std
+#include <iostream>
 #include <string>
 #include <windows.h>
 #include <vector>
+#include <iomanip>
 #include <map>
 
 using namespace std;
 
-enum Worlds { SADNESS, JOY, FEAR, CALM, ANGER, POWER }; // инициализирую миры, name
-enum class Emotion { Sadness, Joy, Fear, Calm, Anger, Power };
+//```
 
-string Emotion_Names[6] = { "Грусть", "Радость", "Страх", "Спокойствие", "Гнев", "Сила" };
-string Worlds_Names[6] = { "Мир Грусти", "Мир Радости", "Мир Страха", "Мир Спокойствия", "Мир Гнева", "Мир Силы" };
-map<Emotion, int> emotionValues;
+//```cpp
 
+// Здесь я начинаю объявлять все глобальные переменные, классы и структуры
 
-struct info {
-    
-    string Dialog_Text;
-    int effect[6];
+enum Worlds_Num { SADNESS, JOY, FEAR, CALM, ANGER, POWER }; // инициализирую миры 
+string Emotion_Names[6] = { "Грусть", "Радость", "Страх", "Спокойствие", "Гнев", "Сила" }; // названия эмоций 
+string Worlds_Names[6] = { "Мир Грусти", "Мир Радости", "Мир Страха", "Мир Спокойствия", "Мир Гнева", "Мир Силы" }; // названия миров
+
+struct Portal_ { // структура для реализации перемещения между мирами посредством команды Go по порталам
+    string name; // у портала есть имя, которое я смогу выводить в консоли для демонстрации выбора перемещения
+    int target; // таргет играет ключеву роль, так как у каждого портала он свой и его можно легко приравнивать к текущему положению игрока (менять его положение)
+    bool open = true; // это флаг который отвечате за то доступен мир игроку или нет
 
 };
 
-class NPC {
+
+
+struct info { // вспомогательная структура для следующего класса
+
+    string dialog_Text; // здесь будет хранится реплеки персонажей
+    int effect[6]; // этот массив отвечает за демонстрацию (посредством метода в классе) того как могут поменяться шкалы игрока в этом диалоге
+
+};
+
+class NPC { // класс для реализации диалогов от лица персонажей игры 
 public:
 
-    string name;
-    vector<info> Words;
+    string name; // имя персонажа
+    vector<info> words; // векторный массив с типом данных нашей вспомогательной структуры
 
-    NPC(string name) : name(name){}
+    NPC(string name) : name(name) {}; // конструктор ожидает имя
 
-    void text( string letter, int sadness, int joy,int fear , int calm, int anger, int power) {
-
-        Words.push_back({ letter, {sadness, joy, fear, calm, anger, power} });
-        // наследование классов изучи полезно будет 
+    void text(string letter, int sadness, int joy, int fear, int calm, int anger, int power) { // в методе ожидаем текст (который будет говорит персонаж)
+                                                                                               // Также ожидаем значения для демонстрации того как будут меняться шкалы при том или ином ответе
+        words.push_back({ letter, {sadness, joy, fear, calm, anger, power} }); // добавляем это все в words 
+        
     }
 
-    void Info() {
+    void info() { // этот метод нужен чтобы непосредственно уже выводить имя персонажа и его реплику
 
-        cout << name << ": " << endl;
+        cout << name << ": "; // выводим имя персонажа
 
-        for (int i = 0; i < Words.size(); i++) {
-            
-            cout << Words[i].Dialog_Text << "\t";
+        for (int i = 0; i < words.size(); i++) {
+
+            cout << words[i].dialog_Text; // выводим текст персонажа
+
             for (int j = 0; j < 6; j++) {
 
+                cout << "(" << words[i].effect[j] << ") "; // выводим то какой эффект окажут ответные реплики игрока на шкалы
 
-                cout <<  Words[i].effect[j] << " ";
             }
 
+            cout << "\n";
         }
 
     }
-    
+
 };
 
-struct Player {
+struct Player { // Структура для персонажа игрока
 
-	string Name;
-	int Current_loc = SADNESS;
-    int Emotions[6] = { 50, 50, 50, 50, 50, 50 };
-    map<Emotion, int> emotionValues;
+    string name; // имя главного героя
+    int current_loc = ANGER; // текущая позиция главного героя
+    int emotions[6] = { 50, 50, 50, 50, 50, 50 }; // эмоциональные шкалы главного героя (находятся в балансе, все по 50)
+
 };
- 
-Player Hero;
+
+struct Location { // структура для реализации миров по которым игрок будет перемещаться
+    string name; // у каждого мира есть свое имя 
+    vector<Portal_> portal; // векторный массив с типом данных прошлой структуры для привязки к мирам добавлен именно сюда
 
 
+};
 
+Player Hero; // Инициализирую персонажа игрока 
+Location Worlds[6]; // Массив с нашими мирами
+vector<NPC> Characters; // Вектор для персонажей (если честно я уже не помню зачем он создавался)
+int Effect[2][6]; // не помню зачем это нужно
 
-
-//NPC Characters[3] = {
-//		   {"Эла", {
-//			   {10, -5, 0, 0, 0, 0},   // Реплика 1: сильное влияние
-//			   {-15, 5, 0, 0, 0, 0},   // Реплика 2: ещё сильнее
-//			   {5, 0, 5, -5, 0, 0}     // Реплика 3: смесь
-//		   }},
-//		   {"Лоран", {
-//			   {5, -2, 0, 0, 0, 0},    // Реплика 1: слабо
-//			   {-5, 2, 0, 0, 0, 0},
-//			   {0, 0, 5, -5, 0, 0}
-//		   }},
-//		   {"Ними", {
-//			   {0, 0, 0, 0, 5, -5},    // Гнев/Сила
-//			   {0, 0, 5, -5, 0, 0},    // Страх/Спокойствие
-//			   {0, 0, -5, 5, 0, 0}
-//		   }}
-//};
-
-/* 
-1) перемещение внутри мира пока что только в формате текста 
-2) Перемещение будет как Go так и по шкалам - срастить 
-3) Master - готовая версия, всегда рабочая ветка. Test - ветка для тестов 
+/*
+ просто мои комментарии чтобы ничего не забыть
+1) перемещение внутри мира пока что только в формате текста
+1.1) все описания также нужно вводить сюда
+1.2) Выбор действий никак не меняетсЯ и не ограничивается выбранными репликами
+2) Перемещение будет как Go так и по шкалам - срастить
+3) Master - готовая версия, всегда рабочая ветка. Test - ветка для тестов  √
 4) По мере роста кода раскидать все по файлам, в них стараться сильно не срать
-5) Нужно автоатизировать систему с влиянием реплик на шкалы чтобы не прописывать для каждой реплики 
-6) эти эмоции с персонажей я буду использовать для изменения эмоций шкал 
-7) мне нужно рандомить девку и пускай она чота должна пиздеть
-8) мне дают вариант ответов 
-9) в зависмимости от выбранного ответа я имзменяю шкалу согласно паттернам в таблице
-10) www
-
+5) Нужно автоатизировать систему с влиянием реплик на шкалы чтобы не прописывать для каждой реплики
+6) эти эмоции с персонажей я буду использовать для изменения эмоций шкал
+6.1) при достижении одной эмоции своих границ  (0 / 100) мир закрывается и мы пермещаемся в другой
+7) мне дают вариант ответов
+8) в зависмимости от выбранного ответа я имзменяю шкалу согласно паттернам в таблице
+9) Насколько подойдут для проекта ассоциативные контейнеры?
 
 */
 
+//```cpp
 
-void Init_Game() {
-
-  /*  NPC Ela("PORNO");
-    Ela.text("BLADIMIR PUTIN MOLODEC", 100, 50, 100, 99, 90, 99);
-    Ela.Info();*/
-
-    emotionValues[Emotion::Sadness] = 50;
-    emotionValues[Emotion::Joy] = 50;
+map<Worlds_Num, Worlds_Num> oppositeWorlds = { // здесь я попарно связал миры для того чтобы реализовать логику закрытия миров попарно
+        {SADNESS, JOY},
+        {JOY, SADNESS},
+        {FEAR, CALM},
+        {CALM, FEAR},
+        {ANGER, POWER},
+        {POWER, ANGER}
+};
+     
+void block_world() {
+ 
 
 }
 
+void transition_control() { // эта функция нужна чтобы проверять не достигли ли эмоциональные шкалы игрока своих лимитов. Если да - перемещение и закрытие мира
+
+    //Hero.emotions[JOY] = 100 - Hero.emotions[SADNESS]; // Эмоции как переливающиеся сосуды
+    //Hero.emotions[CALM] = 100 - Hero.emotions[ANGER]; // Шкалы обязательно должны быть попарно связаны - задумка автора
+    //Hero.emotions[POWER] = 100 - Hero.emotions[FEAR]; // возможно стоит лучше продумать метод для их связывания?
+
+    //if (Hero.emotions[Hero.current_loc] < 0 || Hero.emotions[Hero.current_loc] > 100) { // Проверка только на эмоции текущего мира
+
+    //    for (int i = 0; i < Worlds[Hero.current_loc].portal.size(); i++ ) { // перебираю доступные игроку порталы
+
+    //        if (Worlds[Hero.current_loc].portal[i].open) { // делаю проверку на то открыты ли порталы 
+
+    //            block_world(); // Перемещение в последующую пару миров и блокировка исходной пары миров + сброс шкал 
+
+    //        }
+
+
+    //    }
+
+
+
+    //}
+
+    // Нужно разобратья логику перемещения по мирам через шкалы 
+    // Нужна такая проверка, которая будет проверять не зашло ли значение каждой шкалы за 0 и 100
+    // Нужно связать перемещение по мирам через шкалы попарно. Т.е если мы достигли 100 в sadness, то по такой механике мы перемещаемся только в Joy 
+    // миры попарно связаны
+    // я должен блокировать сам мир для перемещения как по шкале так и по команде Go - флаги? 
+    // Так как у меня отсутствует логика перемещения по мирам через шкалы, то я сначало должен прописать ее  
+    /*   Убрать принудительную связь эмоций?
+
+        Проверка только эмоции текущего мира -=-===
+
+        Поиск противоположного мира ----------
+
+        Блокировка исходного мира
+
+        Сброс эмоций*/
+
+}
+
+// функция для инициализации и добавления важных для игры элементов 
+
+void Init_Game() {
+
+    NPC Ela("PORNO");
+    Ela.text("BLADIMIR PUTIN MOLODEC", 100, 50, 100, 99, 90, 99);
+    //Ela.info();
+
+    // Создаю миры и порталы для них
+    Worlds[0].name = "Мир Грусти";
+    Worlds[0].portal.push_back({ "Мир Радости", 1 });
+    Worlds[0].portal.push_back({ "Мир Страха", 2 });
+    Worlds[0].portal.push_back({ "Мир Спокойствия", 3 });
+    Worlds[0].portal.push_back({ "Мир Гнева", 4 });
+    Worlds[0].portal.push_back({ "Мир Силы", 5 });
+
+    Worlds[1].name = "Мир Радости";
+    Worlds[1].portal.push_back({ "Мир Грусти", 0 });
+    Worlds[1].portal.push_back({ "Мир Страха", 2 });
+    Worlds[1].portal.push_back({ "Мир Спокойствия", 3 });
+    Worlds[1].portal.push_back({ "Мир Гнева", 4 });
+    Worlds[1].portal.push_back({ "Мир Силы", 5 });
+
+    Worlds[2].name = "Мир Страха";
+    Worlds[2].portal.push_back({ "Мир Грусти", 0 });
+    Worlds[2].portal.push_back({ "Мир Радости", 1 });
+    Worlds[2].portal.push_back({ "Мир Спокойствия", 3 });
+    Worlds[2].portal.push_back({ "Мир Гнева", 4 });
+    Worlds[2].portal.push_back({ "Мир Силы", 5 });
+
+    Worlds[3].name = "Мир Спокойствия";
+    Worlds[3].portal.push_back({ "Мир Грусти", 0 });
+    Worlds[3].portal.push_back({ "Мир Радости", 1 });
+    Worlds[3].portal.push_back({ "Мир Страха", 2 });
+    Worlds[3].portal.push_back({ "Мир Гнева", 4 });
+    Worlds[3].portal.push_back({ "Мир Силы", 5 });
+
+    Worlds[4].name = "Мир Гнева";
+    Worlds[4].portal.push_back({ "Мир Грусти", 0 });
+    Worlds[4].portal.push_back({ "Мир Радости", 1 });
+    Worlds[4].portal.push_back({ "Мир Страха", 2 });
+    Worlds[4].portal.push_back({ "Мир Спокойствия", 3 });
+    Worlds[4].portal.push_back({ "Мир Силы", 5 });
+
+    Worlds[5].name = "Мир Силы";
+    Worlds[5].portal.push_back({ "Мир Грусти", 0 });
+    Worlds[5].portal.push_back({ "Мир Радости", 1 });
+    Worlds[5].portal.push_back({ "Мир Страха", 2 });
+    Worlds[5].portal.push_back({ "Мир Спокойствия", 3 });
+    Worlds[5].portal.push_back({ "Мир Гнева", 4 });
+}
+
+// функция для начала игры, здесь я буду прописывать весь ход игры
+
 void Start_Game() {
 
-    bool start = true;
+    bool start = true; // переменная для завершения цикла (может стоить заменить на Hero.life? ), так как логически так игра будет длится до тех пор пока игрок жив
+    string temp; // переменная для ввода команд 
 
     while (start) {
-    
-        int temp;
 
-        cout << "Сосал? (выбери 1 или 2, 3 - вывод шкал эмоций)" << endl;
-        cout << "1) Да" << endl;
-        cout << "2) Нет" << endl;
-        cin >> temp;
 
-        if (temp > 0 || temp < 3) {
+        cout << "тут странности какие то происходят, все в огне \n";
+        cout << "Go - для перемещения \n";
+        cout << "Loc - вывести текущее положение игрока \n";
+        cout << "Start - начать диалог с персонажем \n";
+        cin >> temp; // ожидаем ввода одной из команд команду
 
-            switch (temp) {
-            case(1):
-                emotionValues[Emotion::Sadness] += 10; //??????????????????????
-                break;
-            case(2): 
-                emotionValues[Emotion::Joy] -= 10;
-                break;
-            case(3):
-                cout << Emotion_Names[0] << ": " << emotionValues[Emotion::Sadness] << endl;
-                cout << Emotion_Names[1] << ": " << emotionValues[Emotion::Joy] << endl;
-                break;
+        if (temp == "Go") { // выводит все доступные миры для игрока в соответствии с его текущим положение и статусом портала (открыт / закрыт)   
+
+            for (int i = 0; i < Worlds[Hero.current_loc].portal.size(); i++) {
+
+                cout << i + 1 << ")" << left << setw(20) << Worlds[Hero.current_loc].portal[i].name << "\t"
+                    << (Worlds[Hero.current_loc].portal[i].open ? "Мир открыт \n" : "Мир закрыт \n") << endl;
+
+            }
+
+            cout << "В какой мир желаешь переместиться? \n";
+            int choice; 
+            cin >> choice; // ожидаем ввода числового номера из ранее перечисленных миров
+
+            if (choice > 0 || choice < 6) { // проверяем чтобы ввод соответствовал номерам миров
+
+                for (int i = 0; i < Worlds[Hero.current_loc].portal.size(); i++) { // перебераем доступные порталы
+
+                    if (choice == Worlds[Hero.current_loc].portal[i].target) { //сравниваем введенное число с таргетом портала
+
+                        Hero.current_loc = Worlds[Hero.current_loc].portal[i].target; // меняем значение в текущем положении игрока на таргет портала 
+                        cout << "Current loc: " << Worlds_Names[i] << endl; // так как таргет всегда соответствует определенному миру мы перемещаем игрока и выводим ему его новое положение
+
+                    }
+                }
+            }
+        }
+        if (temp == "Loc") {
+
+            cout << "Current loc: " << Hero.current_loc << endl; // выводим игроку его текущее положение
+
+        }
+        if (temp == "Start") { // начинаем диалог 
+
+
+            bool start = true; // переменная для завершения цикла диалога 
+
+            while (start) {
+
+                for (int i = 0; i < 6; i++) {
+
+                    cout << left << setw(20) << Emotion_Names[i] << "\t" << Hero.emotions[i] << endl; // выводим текущие эмоции игрока
+
+                }
+
+                int choice;
+
+                NPC Ela("Ela");
+                Ela.text("Ты тут? (выбери 1 или 2) ", 60, 40, 50, 50, 50, 50); // в логику вопросов и ответов можно не вдумываться, так как они здесь для галочки
+                Ela.info();
+                cout << "1) нет ()" << endl;
+                cout << "2) да ()" << endl;
+                cin >> choice; // ожидаем ответа игрока на вопрос персонажа
+
+                if (choice > 0 || choice < 2) { // проверяем чтобы ввод соответствовал количеству доступных игроку ответов 
+
+                    switch (choice) {
+                    case(1):
+                        Hero.emotions[SADNESS] += 10; // добавляем в шкалу грусти +10
+                        cout << "Sadness: " << Hero.emotions[SADNESS] << "\n"; // выводим как поменялась шкала из за ответа
+                        break;
+                    case(2):
+                        Hero.emotions[JOY] += 10; // добавляем в шкалу радости +10
+                        cout << "Joy: " << Hero.emotions[JOY] << "\n"; // выводим как поменялась шкала из за ответа
+                        break;
+                    }
+
+                    transition_control(); // применяем нашу функцию для того чтобы отслеживать не вышли ли шкалы эмоций за свои пределы
+
+                }
+                if (choice == 3) {
+
+                    start = false;
+
+                }
             }
         }
     }
 }
 
-
-//
-//    bool start = true;
-//	int round = 0;
-//	int choice;
-//
-//	while (start) {
-//
-//		NPC& c = Characters[round % 3];
-//		cout << "\nТы находишься в " << Worlds_Names[Hero.Current_loc] << ". Тебе встречается " << c.Name << ".\n";
-//		cout << "Выбери реплику:\n";
-//		cout << "1) «Ты ведь всё ещё помнишь?»\n";
-//		cout << "2) «Я пытался забыть»\n";
-//		cout << "3) «Ты была права»\n";
-//		cin >> choice;
-//
-//        if (choice < 1 || choice > 3) {
-//            cout << "Некорректный выбор. Повторите.\n";
-//            continue;
-//        }
-//
-//        // Применение эффекта
-//        int idx = choice - 1;
-//        for (int i = 0; i < 6; i++) {
-//            Emotions[i] += c.Effect[idx][i];
-//            if (Emotions[i] > 100) Emotions[i] = 100;
-//            if (Emotions[i] < 0) Emotions[i] = 0;
-//        }
-//
-//        // Эмоции как переливающиеся сосуды:
-//        Emotions[JOY] = 100 - Emotions[SADNESS];
-//        Emotions[CALM] = 100 - Emotions[ANGER];
-//        Emotions[POWER] = 100 - Emotions[FEAR];
-//
-//        bool extreme = true;
-//        for (int i : {SADNESS, FEAR, ANGER}) {
-//            if (Emotions[i] != 0 && Emotions[i] != 100) {
-//                extreme = false;
-//                break;
-//            }
-//        }
-//        if (extreme) {
-//            cout << "\nВсе эмоции достигли крайних пределов. Ты теряешь себя...\nИгра окончена.\n";
-//            break;
-//        }
-//
-//        // Перенос в другой мир, если текущая эмоция вышла за пределы
-//        if (Emotions[Hero.Current_loc] <= 0 || Emotions[Hero.Current_loc] >= 100) {
-//            for (int i = 0; i < 6; i++) {
-//                if (i != Hero.Current_loc && Emotions[i] > 0 && Emotions[i] < 100) {
-//                    Hero.Current_loc = i;
-//                    cout << ">> Ты переместился в " << Worlds_Names[Hero.Current_loc] << " из-за нестабильности.\n";
-//                    break;
-//                }
-//            }
-//        }
-//
-//        // Вывод эмоций
-//        cout << "\nТекущие эмоции:\n";
-//        for (int i = 0; i < 6; i++) {
-//            cout << Emotion_Names[i] << ": " << Emotions[i] << "\n";
-//        }
-//
-//        round++;
-//	}
-
-
+// Основная функция в которой все хранится 
 int main() {
-	setlocale(LC_ALL, "RU");
-	SetConsoleCP(1251); 
-	SetConsoleOutputCP(1251); 
-	Init_Game();
-	Start_Game();
+    setlocale(LC_ALL, "RU");
+    SetConsoleCP(1251);
+    SetConsoleOutputCP(1251);
+    Init_Game();
+    Start_Game();
 
 }
