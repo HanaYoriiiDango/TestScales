@@ -1,7 +1,4 @@
-﻿//```cpp
-
-// Здесь я объявляю все библиотеки и пространство имен std
-#include <iostream>
+﻿#include <iostream>
 #include <string>
 #include <windows.h>
 #include <vector>
@@ -9,10 +6,6 @@
 #include <map>
 
 using namespace std;
-
-//```
-
-//```cpp
 
 // Здесь я начинаю объявлять все глобальные переменные, классы и структуры
 
