@@ -74,8 +74,9 @@ struct Player { // Структура для персонажа игрока
 
 struct Location { // структура для реализации миров по которым игрок будет перемещаться
     string name; // у каждого мира есть свое имя 
+    Worlds_Num linked_emotion;  // Какая эмоция связана с этим миром
+    bool is_locked = false; // флаг для закрытия мира
     vector<Portal_> portal; // векторный массив с типом данных прошлой структуры для привязки к мирам добавлен именно сюда
-    bool world_open = true;
 
 };
 
@@ -101,11 +102,53 @@ vector<NPC> Characters; // Вектор для персонажей (если ч
 
 */
 
+Worlds_Num get_opposite_world(Worlds_Num world) {
+
+    switch (world) {
+    case SADNESS: return JOY;
+    case JOY: return SADNESS;
+    case FEAR: return CALM;
+    case CALM: return FEAR;
+    case ANGER: return POWER;
+    case POWER: return ANGER;
+    default: return world; 
+    }
+}
+
+
+void Check_movement() {
+
+    Location& current_world = Worlds[Hero.current_loc];  // теперь сюда по ссылке я будет записываться все что в current_world веедь они теперь одно и тоже
+    int emotion_value = Hero.emotions[current_world.linked_emotion]; // значение эмоций игрока в текущем мире
+
+    if (emotion_value <= 0 || emotion_value >= 100) {
+    
+        if (emotion_value <= 0 || emotion_value >= 100) {
+            // Блокируем текущий мир
+            current_world.is_locked = true;
+
+            // Находим противоположный мир
+            Worlds_Num opposite = get_opposite_world(current_world.linked_emotion);
+
+            // Перемещаем игрока
+            Hero.current_loc = opposite;
+            cout << "Переход в " << Worlds_Names[opposite] << endl;
+
+            // Сбрасываем эмоции
+            Hero.emotions[current_world.linked_emotion] = 50;
+            Hero.emotions[opposite] = 50;
+        }
+    
+    }
+
+
+}
+
 void movement_control() { // эта функция нужна чтобы осуществлять перемещение игрока по шкалам из одного мира в другой
 
     for (int i = 0; i < Worlds[Hero.current_loc].name.size(); i++) { // перебираю все миры
 
-        if (Worlds[i].world_open && (i == Worlds[Hero.current_loc].name.size() - 1)) { // выбираю те миры которые открыты на данный момент и i это последующий элемент
+        if (!Worlds[i].is_locked && (i == Worlds[Hero.current_loc].name.size() - 1)) { // выбираю те миры которые открыты на данный момент и i это последующий элемент
 
             Hero.current_loc = i; // перемещаю игрока на последующий мир после заблокированного, но может нужно реализовать перемещение в рандомный мир?
             cout << "You transition: " << Worlds_Names[i] << endl; // вывожу куда игрок переместился
@@ -122,11 +165,11 @@ void block_world() { // эта функция блокирует мир и вы�
 
         if (Hero.emotions[i] == 0 || Hero.emotions[i] == 100) { // Проверка каждой шкалы на то достигли ли они предела 0 или 100
 
-            Worlds[i].world_open = false; // закрываю флажок у мира
+            Worlds[i].is_locked = true; // закрываю флажок у мира
             Worlds[i].portal[i].open = false; // закрываю флажок у порталов в этом мире
             cout << Worlds[i].name << " Cloused \n"; // вывожу информацию что мир теперь закрыт
 
-            if (!Worlds[i].world_open) counter++; // если есть закрытый мир, то я добавляю 1 в счетчик 
+            if (!Worlds[i].is_locked) counter++; // если есть закрытый мир, то я добавляю 1 в счетчик 
 
         }
     }
@@ -155,28 +198,46 @@ void emotion_control() { // Эта функция нужна чтобы до к�
     Hero.emotions[CALM] = 100 - Hero.emotions[ANGER]; // Шкалы обязательно должны быть попарно связаны - задумка автора
     Hero.emotions[POWER] = 100 - Hero.emotions[FEAR]; // возможно стоит лучше продумать метод для их связывания?
 
-    // Блокируем шкалы для изменений до конца игры, если шкала перешла за пределы 100 или 0
-    if (Hero.emotions[JOY] >= 100) Hero.emotions[JOY] = 100;
-    if (Hero.emotions[JOY] <= 0) Hero.emotions[JOY] = 0;
-
-    if (Hero.emotions[CALM] >= 100) Hero.emotions[CALM] = 100;
-    if (Hero.emotions[CALM] <= 0) Hero.emotions[CALM] = 0;
-
-    if (Hero.emotions[POWER] >= 100) Hero.emotions[POWER] = 100;
-    if (Hero.emotions[POWER] <= 0) Hero.emotions[POWER] = 0;
-
-    if (Hero.emotions[SADNESS] >= 100) Hero.emotions[SADNESS] = 100;
-    if (Hero.emotions[SADNESS] <= 0) Hero.emotions[SADNESS] = 0;
-
-    if (Hero.emotions[ANGER] >= 100) Hero.emotions[ANGER] = 100;
-    if (Hero.emotions[ANGER] <= 0) Hero.emotions[ANGER] = 0;
-
-    if (Hero.emotions[FEAR] >= 100) Hero.emotions[FEAR] = 100;
-    if (Hero.emotions[FEAR] <= 0) Hero.emotions[FEAR] = 0;
-
     block_world();// вызываем функцию блокирующую миры, чтобы игрок не смог по ним перемещаться
 
 }
+
+void Change_emotions_plus(Worlds_Num emotion, int x) { // Изменяет шкалу эмоции, она принимает эмоцию и то число на сколько ее изменить
+
+    if (Worlds[Hero.current_loc].linked_emotion == emotion && // Это защита для кода от закрытых миров
+        Worlds[Hero.current_loc].is_locked) { // потому что мы не будем ничего менять если мир уже закрыт
+        return;
+    }
+
+    int new_value = Hero.emotions[emotion] + x; // записываем новое значение для шкалы
+
+    if (new_value < 0) new_value = 0; // Блокируем шкалы для изменений до конца игры, если шкала перешла за пределы 100 или 0
+    if (new_value > 100) new_value = 100;
+
+    Hero.emotions[emotion] = new_value; 
+
+    Check_movement(); // Проверяем переходы
+
+}
+
+void Change_emotions_minus(Worlds_Num emotion, int x) { // Изменяет шкалу эмоции, она принимает эмоцию и то число на сколько ее изменить
+
+    if (Worlds[Hero.current_loc].linked_emotion == emotion && // Это защита для кода от закрытых миров
+        Worlds[Hero.current_loc].is_locked) { // потому что мы не будем ничего менять если мир уже закрыт
+        return;
+    }
+
+    int new_value = Hero.emotions[emotion] + x; // записываем новое значение для шкалы
+
+    if (new_value < 0) new_value = 0; // Блокируем шкалы для изменений до конца игры, если шкала перешла за пределы 100 или 0
+    if (new_value > 100) new_value = 100;
+
+    Hero.emotions[emotion] = new_value;
+
+    Check_movement(); // Проверяем переходы
+
+}
+
 
 // функция для инициализации и добавления важных для игры элементов 
 
@@ -187,47 +248,47 @@ void Init_Game() {
     //Ela.info();
 
     // Создаю миры и порталы для них
-    Worlds[0].name = "Мир Грусти";
-    Worlds[0].portal.push_back({ "Мир Радости", 1 });
-    Worlds[0].portal.push_back({ "Мир Страха", 2 });
-    Worlds[0].portal.push_back({ "Мир Спокойствия", 3 });
-    Worlds[0].portal.push_back({ "Мир Гнева", 4 });
-    Worlds[0].portal.push_back({ "Мир Силы", 5 });
+    Worlds[SADNESS].name = "Мир Грусти";
+    Worlds[SADNESS].portal.push_back({"Мир Радости", JOY });
+    Worlds[SADNESS].portal.push_back({ "Мир Страха", FEAR });
+    Worlds[SADNESS].portal.push_back({ "Мир Спокойствия", CALM });
+    Worlds[SADNESS].portal.push_back({ "Мир Гнева", ANGER });
+    Worlds[SADNESS].portal.push_back({ "Мир Силы", POWER });
 
-    Worlds[1].name = "Мир Радости";
-    Worlds[1].portal.push_back({ "Мир Грусти", 0 });
-    Worlds[1].portal.push_back({ "Мир Страха", 2 });
-    Worlds[1].portal.push_back({ "Мир Спокойствия", 3 });
-    Worlds[1].portal.push_back({ "Мир Гнева", 4 });
-    Worlds[1].portal.push_back({ "Мир Силы", 5 });
+    Worlds[JOY].name = "Мир Радости";
+    Worlds[JOY].portal.push_back({ "Мир Грусти", SADNESS });
+    Worlds[JOY].portal.push_back({ "Мир Страха", FEAR });
+    Worlds[JOY].portal.push_back({ "Мир Спокойствия", CALM });
+    Worlds[JOY].portal.push_back({ "Мир Гнева", ANGER });
+    Worlds[JOY].portal.push_back({ "Мир Силы", POWER });
 
-    Worlds[2].name = "Мир Страха";
-    Worlds[2].portal.push_back({ "Мир Грусти", 0 });
-    Worlds[2].portal.push_back({ "Мир Радости", 1 });
-    Worlds[2].portal.push_back({ "Мир Спокойствия", 3 });
-    Worlds[2].portal.push_back({ "Мир Гнева", 4 });
-    Worlds[2].portal.push_back({ "Мир Силы", 5 });
+    Worlds[FEAR].name = "Мир Страха";
+    Worlds[FEAR].portal.push_back({ "Мир Грусти", SADNESS });
+    Worlds[FEAR].portal.push_back({ "Мир Радости", JOY });
+    Worlds[FEAR].portal.push_back({ "Мир Спокойствия", CALM });
+    Worlds[FEAR].portal.push_back({ "Мир Гнева", ANGER });
+    Worlds[FEAR].portal.push_back({ "Мир Силы", POWER });
 
-    Worlds[3].name = "Мир Спокойствия";
-    Worlds[3].portal.push_back({ "Мир Грусти", 0 });
-    Worlds[3].portal.push_back({ "Мир Радости", 1 });
-    Worlds[3].portal.push_back({ "Мир Страха", 2 });
-    Worlds[3].portal.push_back({ "Мир Гнева", 4 });
-    Worlds[3].portal.push_back({ "Мир Силы", 5 });
+    Worlds[CALM].name = "Мир Спокойствия";
+    Worlds[CALM].portal.push_back({ "Мир Грусти", SADNESS });
+    Worlds[CALM].portal.push_back({ "Мир Радости", JOY });
+    Worlds[CALM].portal.push_back({ "Мир Страха", FEAR });
+    Worlds[CALM].portal.push_back({ "Мир Гнева", ANGER });
+    Worlds[CALM].portal.push_back({ "Мир Силы", POWER });
 
-    Worlds[4].name = "Мир Гнева";
-    Worlds[4].portal.push_back({ "Мир Грусти", 0 });
-    Worlds[4].portal.push_back({ "Мир Радости", 1 });
-    Worlds[4].portal.push_back({ "Мир Страха", 2 });
-    Worlds[4].portal.push_back({ "Мир Спокойствия", 3 });
-    Worlds[4].portal.push_back({ "Мир Силы", 5 });
+    Worlds[ANGER].name = "Мир Гнева";
+    Worlds[ANGER].portal.push_back({ "Мир Грусти", SADNESS });
+    Worlds[ANGER].portal.push_back({ "Мир Радости", JOY });
+    Worlds[ANGER].portal.push_back({ "Мир Страха", FEAR });
+    Worlds[ANGER].portal.push_back({ "Мир Спокойствия", CALM });
+    Worlds[ANGER].portal.push_back({ "Мир Силы", POWER });
 
-    Worlds[5].name = "Мир Силы";
-    Worlds[5].portal.push_back({ "Мир Грусти", 0 });
-    Worlds[5].portal.push_back({ "Мир Радости", 1 });
-    Worlds[5].portal.push_back({ "Мир Страха", 2 });
-    Worlds[5].portal.push_back({ "Мир Спокойствия", 3 });
-    Worlds[5].portal.push_back({ "Мир Гнева", 4 });
+    Worlds[POWER].name = "Мир Силы";
+    Worlds[POWER].portal.push_back({ "Мир Грусти", SADNESS });
+    Worlds[POWER].portal.push_back({ "Мир Радости", JOY });
+    Worlds[POWER].portal.push_back({ "Мир Страха", FEAR });
+    Worlds[POWER].portal.push_back({ "Мир Спокойствия", CALM });
+    Worlds[POWER].portal.push_back({ "Мир Гнева", ANGER });
 }
 
 // функция для начала игры, здесь я буду прописывать весь ход игры
@@ -263,7 +324,7 @@ void Start_Game() {
 
                 for (int i = 0; i < Worlds[Hero.current_loc].portal.size(); i++) { // перебераем доступные порталы
 
-                    if (Worlds[i].world_open) {
+                    if (!Worlds[i].is_locked) {
 
                         if (choice == Worlds[Hero.current_loc].portal[i].target) { //сравниваем введенное число с таргетом портала
 
@@ -308,13 +369,11 @@ void Start_Game() {
 
                     switch (choice) {
                     case(1):
-                        Hero.emotions[SADNESS] += 10; // добавляем в шкалу грусти +10
-                        emotion_control();
+                        Change_emotions_plus(SADNESS, 10);
                         cout << "Sadness: " << Hero.emotions[SADNESS] << "\n"; // выводим как поменялась шкала из за ответа
                         break;
                     case(2):
-                        Hero.emotions[JOY] += 10; // добавляем в шкалу радости +10
-                        emotion_control();
+                        Change_emotions_minus(JOY, 10);
                         cout << "Joy: " << Hero.emotions[JOY] << "\n"; // выводим как поменялась шкала из за ответа
                         break;
                     }
