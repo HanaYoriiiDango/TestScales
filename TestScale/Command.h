@@ -1,8 +1,8 @@
-#pragma once
+п»ї#pragma once
 
 #include "object.h"
 
-Worlds_Num get_opposite_world(Worlds_Num world) { // принимает одну эмоцию а возвращает противоположную
+Worlds_Num get_opposite_world(Worlds_Num world) { // РїСЂРёРЅРёРјР°РµС‚ РѕРґРЅСѓ СЌРјРѕС†РёСЋ Р° РІРѕР·РІСЂР°С‰Р°РµС‚ РїСЂРѕС‚РёРІРѕРїРѕР»РѕР¶РЅСѓСЋ
 
     switch (world) {
     case (SADNESS): return JOY;
@@ -17,21 +17,21 @@ Worlds_Num get_opposite_world(Worlds_Num world) { // принимает одну эмоцию а воз
 
 void Check_movement() {
 
-    for (int i = 0; i < 6; i++) {     // Проверяем все эмоции на достижение предела
+    for (int i = 0; i < 6; i++) {     // РџСЂРѕРІРµСЂСЏРµРј РІСЃРµ СЌРјРѕС†РёРё РЅР° РґРѕСЃС‚РёР¶РµРЅРёРµ РїСЂРµРґРµР»Р°
         Worlds_Num emotion = static_cast<Worlds_Num>(i);
         int emotion_value = Hero.emotions[i];
 
-        if ((emotion_value <= 0 || emotion_value >= 100) && !Worlds[i].is_locked) {// Если эмоция достигла предела и её мир еще не заблокирован
+        if ((emotion_value <= 0 || emotion_value >= 100) && !Worlds[i].is_locked) {// Р•СЃР»Рё СЌРјРѕС†РёСЏ РґРѕСЃС‚РёРіР»Р° РїСЂРµРґРµР»Р° Рё РµС‘ РјРёСЂ РµС‰Рµ РЅРµ Р·Р°Р±Р»РѕРєРёСЂРѕРІР°РЅ
 
-            Worlds[i].is_locked = true; // 1. Блокируем мир этой эмоции
+            Worlds[i].is_locked = true; // 1. Р‘Р»РѕРєРёСЂСѓРµРј РјРёСЂ СЌС‚РѕР№ СЌРјРѕС†РёРё
 
-            Worlds_Num opposite_emotion = get_opposite_world(emotion); // 2. Блокируем противоположный мир
+            Worlds_Num opposite_emotion = get_opposite_world(emotion); // 2. Р‘Р»РѕРєРёСЂСѓРµРј РїСЂРѕС‚РёРІРѕРїРѕР»РѕР¶РЅС‹Р№ РјРёСЂ
             Worlds[static_cast<int>(opposite_emotion)].is_locked = true;
 
-            Hero.emotions[emotion] = 50; // 3. Сбрасываем эмоции
+            Hero.emotions[emotion] = 50; // 3. РЎР±СЂР°СЃС‹РІР°РµРј СЌРјРѕС†РёРё
             Hero.emotions[opposite_emotion] = 50;
 
-            if (Hero.current_loc == i || Hero.current_loc == static_cast<int>(opposite_emotion)) { // 4. Если игрок находится в одном из закрываемых миров - перемещаем
+            if (Hero.current_loc == i || Hero.current_loc == static_cast<int>(opposite_emotion)) { // 4. Р•СЃР»Рё РёРіСЂРѕРє РЅР°С…РѕРґРёС‚СЃСЏ РІ РѕРґРЅРѕРј РёР· Р·Р°РєСЂС‹РІР°РµРјС‹С… РјРёСЂРѕРІ - РїРµСЂРµРјРµС‰Р°РµРј
                 vector<int> available_worlds;
                 for (int j = 0; j < 6; j++) {
                     if (!Worlds[j].is_locked) {
@@ -42,47 +42,47 @@ void Check_movement() {
                 if (!available_worlds.empty()) {
                     int random_index = rand() % available_worlds.size();
                     Hero.current_loc = available_worlds[random_index];
-                    cout << ">> Переход в " << Worlds_Names[Hero.current_loc]
-                        << " из-за блокировки " << Worlds_Names[i]
-                        << " и " << Worlds_Names[opposite_emotion] << endl;
+                    cout << ">> РџРµСЂРµС…РѕРґ РІ " << Worlds_Names[Hero.current_loc]
+                        << " РёР·-Р·Р° Р±Р»РѕРєРёСЂРѕРІРєРё " << Worlds_Names[i]
+                        << " Рё " << Worlds_Names[opposite_emotion] << endl;
                 }
                 else {
-                    cout << ">> Все миры закрыты! Игра завершена.\n";
-                    // Завершение игры
+                    cout << ">> Р’СЃРµ РјРёСЂС‹ Р·Р°РєСЂС‹С‚С‹! РРіСЂР° Р·Р°РІРµСЂС€РµРЅР°.\n";
+                    // Р—Р°РІРµСЂС€РµРЅРёРµ РёРіСЂС‹
                 }
             }
             else {
-                cout << ">> " << Worlds_Names[i] << " и "
-                    << Worlds_Names[opposite_emotion] << " закрыты!\n";
+                cout << ">> " << Worlds_Names[i] << " Рё "
+                    << Worlds_Names[opposite_emotion] << " Р·Р°РєСЂС‹С‚С‹!\n";
             }
         }
     }
 }
 
-void Change_emotions(Worlds_Num emotion, char math, int x) { // Изменяет шкалу эмоции, она принимает эмоцию и то число на сколько ее изменить
+void Change_emotions(Worlds_Num emotion, char math, int x) { // РР·РјРµРЅСЏРµС‚ С€РєР°Р»Сѓ СЌРјРѕС†РёРё, РѕРЅР° РїСЂРёРЅРёРјР°РµС‚ СЌРјРѕС†РёСЋ Рё С‚Рѕ С‡РёСЃР»Рѕ РЅР° СЃРєРѕР»СЊРєРѕ РµРµ РёР·РјРµРЅРёС‚СЊ
 
-    // Здесь я решил дополнить функцию возможностью выбирать то, будет шкала уменьшаться или увеличиваться с помощью char math
+    // Р—РґРµСЃСЊ СЏ СЂРµС€РёР» РґРѕРїРѕР»РЅРёС‚СЊ С„СѓРЅРєС†РёСЋ РІРѕР·РјРѕР¶РЅРѕСЃС‚СЊСЋ РІС‹Р±РёСЂР°С‚СЊ С‚Рѕ, Р±СѓРґРµС‚ С€РєР°Р»Р° СѓРјРµРЅСЊС€Р°С‚СЊСЃСЏ РёР»Рё СѓРІРµР»РёС‡РёРІР°С‚СЊСЃСЏ СЃ РїРѕРјРѕС‰СЊСЋ char math
 
     if (Worlds[static_cast<int>(emotion)].is_locked) {
         return;
     }
 
-    if (math != '+' && math != '-') return; // проверка на валидацию внутри кода
+    if (math != '+' && math != '-') return; // РїСЂРѕРІРµСЂРєР° РЅР° РІР°Р»РёРґР°С†РёСЋ РІРЅСѓС‚СЂРё РєРѕРґР°
 
     int new_value = Hero.emotions[emotion];
 
-    if (math == '+') new_value += x; // записываем новое значение для шкалы в переменную
-    else new_value -= x; // записываем новое значение для шкалы в переменную
+    if (math == '+') new_value += x; // Р·Р°РїРёСЃС‹РІР°РµРј РЅРѕРІРѕРµ Р·РЅР°С‡РµРЅРёРµ РґР»СЏ С€РєР°Р»С‹ РІ РїРµСЂРµРјРµРЅРЅСѓСЋ
+    else new_value -= x; // Р·Р°РїРёСЃС‹РІР°РµРј РЅРѕРІРѕРµ Р·РЅР°С‡РµРЅРёРµ РґР»СЏ С€РєР°Р»С‹ РІ РїРµСЂРµРјРµРЅРЅСѓСЋ
 
-    if (new_value < 0) new_value = 0; // Блокируем шкалы с новым значением, если шкала перешла за пределы 100 или 0
+    if (new_value < 0) new_value = 0; // Р‘Р»РѕРєРёСЂСѓРµРј С€РєР°Р»С‹ СЃ РЅРѕРІС‹Рј Р·РЅР°С‡РµРЅРёРµРј, РµСЃР»Рё С€РєР°Р»Р° РїРµСЂРµС€Р»Р° Р·Р° РїСЂРµРґРµР»С‹ 100 РёР»Рё 0
     if (new_value > 100) new_value = 100;
 
-    Hero.emotions[emotion] = new_value; // а теперь записываем новое значение в эмоции игрока
+    Hero.emotions[emotion] = new_value; // Р° С‚РµРїРµСЂСЊ Р·Р°РїРёСЃС‹РІР°РµРј РЅРѕРІРѕРµ Р·РЅР°С‡РµРЅРёРµ РІ СЌРјРѕС†РёРё РёРіСЂРѕРєР°
 
-    Worlds_Num opposite_emotion = get_opposite_world(emotion); // Эмоции как переливающиеся сосуды
+    Worlds_Num opposite_emotion = get_opposite_world(emotion); // Р­РјРѕС†РёРё РєР°Рє РїРµСЂРµР»РёРІР°СЋС‰РёРµСЃСЏ СЃРѕСЃСѓРґС‹
     Hero.emotions[opposite_emotion] = 100 - Hero.emotions[emotion];
 
-    if (emotion == Worlds[Hero.current_loc].linked_emotion) {  // Проверка переходов только для эмоции текущего мира
+    if (emotion == Worlds[Hero.current_loc].linked_emotion) {  // РџСЂРѕРІРµСЂРєР° РїРµСЂРµС…РѕРґРѕРІ С‚РѕР»СЊРєРѕ РґР»СЏ СЌРјРѕС†РёРё С‚РµРєСѓС‰РµРіРѕ РјРёСЂР°
         Check_movement();
     }
 
@@ -90,20 +90,20 @@ void Change_emotions(Worlds_Num emotion, char math, int x) { // Изменяет шкалу э
 
 void Start_dialog() {
 
-    bool start = true; // переменная для завершения цикла диалога 
+    bool start = true; // РїРµСЂРµРјРµРЅРЅР°СЏ РґР»СЏ Р·Р°РІРµСЂС€РµРЅРёСЏ С†РёРєР»Р° РґРёР°Р»РѕРіР° 
 
     while (start) {
 
         for (int i = 0; i < 6; i++) {
 
-            cout << left << setw(20) << Emotion_Names[i] << "\t" << Hero.emotions[i] << endl; // выводим текущие эмоции игрока
+            cout << left << setw(20) << Emotion_Names[i] << "\t" << Hero.emotions[i] << endl; // РІС‹РІРѕРґРёРј С‚РµРєСѓС‰РёРµ СЌРјРѕС†РёРё РёРіСЂРѕРєР°
 
         }
 
         int choice;
 
         NPC Ela("Ela");
-        Ela.text("Ты тут? (выбери 1 / 2..., 0 - exit) ", 60, 40, 60, 40, 60, 40);
+        Ela.text("РўС‹ С‚СѓС‚? (РІС‹Р±РµСЂРё 1 / 2..., 0 - exit) ", 60, 40, 60, 40, 60, 40);
         Ela.info();
         cout << "1) SADNESS (+10)" << endl;
         cout << "2) JOY (-10)" << endl;
@@ -111,44 +111,44 @@ void Start_dialog() {
         cout << "4) ANGER (-10)" << endl;
         cout << "5) POWER (+10)" << endl;
         cout << "6) CALM (-10)" << endl;
-        cin >> choice; // ожидаем ответа игрока на вопрос персонажа
+        cin >> choice; // РѕР¶РёРґР°РµРј РѕС‚РІРµС‚Р° РёРіСЂРѕРєР° РЅР° РІРѕРїСЂРѕСЃ РїРµСЂСЃРѕРЅР°Р¶Р°
 
-        if (choice >= 0 || choice <= 6) { // проверяем чтобы ввод соответствовал количеству доступных игроку ответов 
+        if (choice >= 0 || choice <= 6) { // РїСЂРѕРІРµСЂСЏРµРј С‡С‚РѕР±С‹ РІРІРѕРґ СЃРѕРѕС‚РІРµС‚СЃС‚РІРѕРІР°Р» РєРѕР»РёС‡РµСЃС‚РІСѓ РґРѕСЃС‚СѓРїРЅС‹С… РёРіСЂРѕРєСѓ РѕС‚РІРµС‚РѕРІ 
 
             switch (choice) {
             case(1):
                 Change_emotions(SADNESS, '+', 10);
                 //Change_emotions(JOY, '-', 10); //????
-                cout << "Sadness: " << Hero.emotions[SADNESS] << "\n"; // выводим как поменялась шкала из за ответа
+                cout << "Sadness: " << Hero.emotions[SADNESS] << "\n"; // РІС‹РІРѕРґРёРј РєР°Рє РїРѕРјРµРЅСЏР»Р°СЃСЊ С€РєР°Р»Р° РёР· Р·Р° РѕС‚РІРµС‚Р°
                 break;
             case(2):
                 Change_emotions(JOY, '-', 10);
                 //Change_emotions(JOY, '+', 10); //????
-                cout << "Joy: " << Hero.emotions[JOY] << "\n"; // выводим как поменялась шкала из за ответа
+                cout << "Joy: " << Hero.emotions[JOY] << "\n"; // РІС‹РІРѕРґРёРј РєР°Рє РїРѕРјРµРЅСЏР»Р°СЃСЊ С€РєР°Р»Р° РёР· Р·Р° РѕС‚РІРµС‚Р°
                 break;
             case(3):
                 Change_emotions(FEAR, '+', 10);
                 //Change_emotions(JOY, '-', 10); //????
-                cout << "FEAR: " << Hero.emotions[FEAR] << "\n"; // выводим как поменялась шкала из за ответа
+                cout << "FEAR: " << Hero.emotions[FEAR] << "\n"; // РІС‹РІРѕРґРёРј РєР°Рє РїРѕРјРµРЅСЏР»Р°СЃСЊ С€РєР°Р»Р° РёР· Р·Р° РѕС‚РІРµС‚Р°
                 break;
             case(4):
                 Change_emotions(ANGER, '-', 10);
                 //Change_emotions(ANGER, '+', 10);
-                cout << "ANGER: " << Hero.emotions[ANGER] << "\n"; // выводим как поменялась шкала из за ответа
+                cout << "ANGER: " << Hero.emotions[ANGER] << "\n"; // РІС‹РІРѕРґРёРј РєР°Рє РїРѕРјРµРЅСЏР»Р°СЃСЊ С€РєР°Р»Р° РёР· Р·Р° РѕС‚РІРµС‚Р°
                 break;
             case(5):
                 Change_emotions(POWER, '+', 10);
                 //Change_emotions(POWER, '-', 10);
-                cout << "POWER: " << Hero.emotions[POWER] << "\n"; // выводим как поменялась шкала из за ответа
+                cout << "POWER: " << Hero.emotions[POWER] << "\n"; // РІС‹РІРѕРґРёРј РєР°Рє РїРѕРјРµРЅСЏР»Р°СЃСЊ С€РєР°Р»Р° РёР· Р·Р° РѕС‚РІРµС‚Р°
                 break;
             case(6):
                 Change_emotions(CALM, '-', 10);
                 //Change_emotions(CALM, '+', 10);
-                cout << "CALM: " << Hero.emotions[CALM] << "\n"; // выводим как поменялась шкала из за ответа
+                cout << "CALM: " << Hero.emotions[CALM] << "\n"; // РІС‹РІРѕРґРёРј РєР°Рє РїРѕРјРµРЅСЏР»Р°СЃСЊ С€РєР°Р»Р° РёР· Р·Р° РѕС‚РІРµС‚Р°
                 break;
             }
         }
-        if (choice == 0) { // выход с диалога
+        if (choice == 0) { // РІС‹С…РѕРґ СЃ РґРёР°Р»РѕРіР°
 
             start = false;
 
@@ -162,43 +162,43 @@ void Command_Go() {
     for (int i = 0; i < Worlds[Hero.current_loc].portal.size(); i++) {
 
         cout << i + 1 << ")" << left << setw(20) << Worlds[Hero.current_loc].portal[i].name << "\t"
-            << (!Worlds[i].is_locked ? "Мир открыт \n" : "Мир закрыт \n") << endl;
+            << (!Worlds[i].is_locked ? "РњРёСЂ РѕС‚РєСЂС‹С‚ \n" : "РњРёСЂ Р·Р°РєСЂС‹С‚ \n") << endl;
 
     }
 
-    cout << "В какой мир желаешь переместиться? \n";
+    cout << "Р’ РєР°РєРѕР№ РјРёСЂ Р¶РµР»Р°РµС€СЊ РїРµСЂРµРјРµСЃС‚РёС‚СЊСЃСЏ? \n";
     int choice;
-    cin >> choice; // ожидаем ввода числового номера из ранее перечисленных миров
+    cin >> choice; // РѕР¶РёРґР°РµРј РІРІРѕРґР° С‡РёСЃР»РѕРІРѕРіРѕ РЅРѕРјРµСЂР° РёР· СЂР°РЅРµРµ РїРµСЂРµС‡РёСЃР»РµРЅРЅС‹С… РјРёСЂРѕРІ
 
-    if (choice > 0 || choice <= Worlds[Hero.current_loc].portal.size()) { // проверяем чтобы ввод соответствовал номерам миров
+    if (choice > 0 || choice <= Worlds[Hero.current_loc].portal.size()) { // РїСЂРѕРІРµСЂСЏРµРј С‡С‚РѕР±С‹ РІРІРѕРґ СЃРѕРѕС‚РІРµС‚СЃС‚РІРѕРІР°Р» РЅРѕРјРµСЂР°Рј РјРёСЂРѕРІ
 
-        int target_index = choice - 1;  // нивелирует тот факт что я ввожу 1 а меня перемещает в ноль (тк в коде для демонстрации i + 1) wwwwwe
+        int target_index = choice - 1;  // РЅРёРІРµР»РёСЂСѓРµС‚ С‚РѕС‚ С„Р°РєС‚ С‡С‚Рѕ СЏ РІРІРѕР¶Сѓ 1 Р° РјРµРЅСЏ РїРµСЂРµРјРµС‰Р°РµС‚ РІ РЅРѕР»СЊ (С‚Рє РІ РєРѕРґРµ РґР»СЏ РґРµРјРѕРЅСЃС‚СЂР°С†РёРё i + 1) wwwwwe
         Portal_& portal = Worlds[Hero.current_loc].portal[target_index];
 
         if (portal.open && !Worlds[portal.target].is_locked) {
             Hero.current_loc = portal.target;
-            cout << "Ты переместился в " << Worlds_Names[Hero.current_loc] << endl;
+            cout << "РўС‹ РїРµСЂРµРјРµСЃС‚РёР»СЃСЏ РІ " << Worlds_Names[Hero.current_loc] << endl;
         }
         else {
-            cout << "Этот мир закрыт!\n";
+            cout << "Р­С‚РѕС‚ РјРёСЂ Р·Р°РєСЂС‹С‚!\n";
         }
     }
 }
 
 void Start_Game() {
 
-    string temp; // переменная для ввода команд 
+    string temp; // РїРµСЂРµРјРµРЅРЅР°СЏ РґР»СЏ РІРІРѕРґР° РєРѕРјР°РЅРґ 
 
     while (Hero.life) {
 
-        cout << "тут странности какие то происходят, все в огне \n";
-        cout << "Go - для перемещения \n";
-        cout << "Loc - вывести текущее положение игрока \n";
-        cout << "Start - начать диалог с персонажем \n";
-        cin >> temp; // ожидаем ввода одной из команд 
+        cout << "С‚СѓС‚ СЃС‚СЂР°РЅРЅРѕСЃС‚Рё РєР°РєРёРµ С‚Рѕ РїСЂРѕРёСЃС…РѕРґСЏС‚, РІСЃРµ РІ РѕРіРЅРµ \n";
+        cout << "Go - РґР»СЏ РїРµСЂРµРјРµС‰РµРЅРёСЏ \n";
+        cout << "Loc - РІС‹РІРµСЃС‚Рё С‚РµРєСѓС‰РµРµ РїРѕР»РѕР¶РµРЅРёРµ РёРіСЂРѕРєР° \n";
+        cout << "Start - РЅР°С‡Р°С‚СЊ РґРёР°Р»РѕРі СЃ РїРµСЂСЃРѕРЅР°Р¶РµРј \n";
+        cin >> temp; // РѕР¶РёРґР°РµРј РІРІРѕРґР° РѕРґРЅРѕР№ РёР· РєРѕРјР°РЅРґ 
 
-        if (temp == "Go") Command_Go(); // выводит все доступные миры для игрока и позволяет перемещаться по тем мирам что доступы игроку  
-        if (temp == "Loc") cout << "Current loc: " << Hero.current_loc << endl; // выводим игроку его текущее положение
-        if (temp == "Start") Start_dialog(); // начинаем диалог с персонажем
+        if (temp == "Go") Command_Go(); // РІС‹РІРѕРґРёС‚ РІСЃРµ РґРѕСЃС‚СѓРїРЅС‹Рµ РјРёСЂС‹ РґР»СЏ РёРіСЂРѕРєР° Рё РїРѕР·РІРѕР»СЏРµС‚ РїРµСЂРµРјРµС‰Р°С‚СЊСЃСЏ РїРѕ С‚РµРј РјРёСЂР°Рј С‡С‚Рѕ РґРѕСЃС‚СѓРїС‹ РёРіСЂРѕРєСѓ  
+        if (temp == "Loc") cout << "Current loc: " << Hero.current_loc << endl; // РІС‹РІРѕРґРёРј РёРіСЂРѕРєСѓ РµРіРѕ С‚РµРєСѓС‰РµРµ РїРѕР»РѕР¶РµРЅРёРµ
+        if (temp == "Start") Start_dialog(); // РЅР°С‡РёРЅР°РµРј РґРёР°Р»РѕРі СЃ РїРµСЂСЃРѕРЅР°Р¶РµРј
     }
 }
