@@ -2,6 +2,16 @@
 
 #include "object.h"
 
+//void textOut(string temp) { пример реализации с инета 
+//
+//    for (int i = 0; i < temp.size(); i++) {
+//
+//       cout << temp[i];
+//       cout.flush();  // Обновление вывода 
+//       this_thread::sleep_for(std::chrono::microseconds(300));  // Задержка на 1 секунду 
+//    }
+//}
+
 Worlds_Num get_opposite_world(Worlds_Num world) { // принимает одну эмоцию а возвращает противоположную
 
     switch (world) {
@@ -105,12 +115,31 @@ void Start_dialog() {
         NPC Ela("Ela");
         Ela.text("Ты тут? (выбери 1 / 2..., 0 - exit) ", 60, 40, 60, 40, 60, 40);
         Ela.info();
-        cout << "1) SADNESS (+10)" << endl;
-        cout << "2) JOY (-10)" << endl;
-        cout << "3) FEAR (+10)" << endl;
-        cout << "4) ANGER (-10)" << endl;
-        cout << "5) POWER (+10)" << endl;
-        cout << "6) CALM (-10)" << endl;
+
+        cout << "1) SADNESS (+10)" << endl; // 1
+        cout.flush();
+        this_thread::sleep_for(std::chrono::milliseconds(500));
+
+        cout << "2) JOY (-10)" << endl; // 2
+        cout.flush();
+        this_thread::sleep_for(std::chrono::milliseconds(500));
+
+        cout << "3) FEAR (+10)" << endl; // 3 
+        cout.flush();
+        this_thread::sleep_for(std::chrono::milliseconds(500));
+
+        cout << "4) ANGER (-10)" << endl; // 4
+        cout.flush();
+        this_thread::sleep_for(std::chrono::milliseconds(500));
+
+        cout << "5) POWER (+10)" << endl; // 5 
+        cout.flush();
+        this_thread::sleep_for(std::chrono::milliseconds(500));
+
+        cout << "6) CALM (-10)" << endl; // 6
+        cout.flush();
+        this_thread::sleep_for(std::chrono::milliseconds(500));
+
         cin >> choice; // ожидаем ответа игрока на вопрос персонажа
 
         if (choice >= 0 || choice <= 6) { // проверяем чтобы ввод соответствовал количеству доступных игроку ответов 
@@ -118,33 +147,39 @@ void Start_dialog() {
             switch (choice) {
             case(1):
                 Change_emotions(SADNESS, '+', 10);
-                //Change_emotions(JOY, '-', 10); //????
                 cout << "Sadness: " << Hero.emotions[SADNESS] << "\n"; // выводим как поменялась шкала из за ответа
+                cout.flush();
+                this_thread::sleep_for(std::chrono::milliseconds(800));
                 break;
             case(2):
                 Change_emotions(JOY, '-', 10);
-                //Change_emotions(JOY, '+', 10); //????
-                cout << "Joy: " << Hero.emotions[JOY] << "\n"; // выводим как поменялась шкала из за ответа
+                cout << ": " << Hero.emotions[JOY] << "\n"; // выводим как поменялась шкала из за ответа
+                cout.flush();
+                this_thread::sleep_for(std::chrono::milliseconds(800));
                 break;
             case(3):
                 Change_emotions(FEAR, '+', 10);
-                //Change_emotions(JOY, '-', 10); //????
                 cout << "FEAR: " << Hero.emotions[FEAR] << "\n"; // выводим как поменялась шкала из за ответа
+                cout.flush();
+                this_thread::sleep_for(std::chrono::milliseconds(800));
                 break;
             case(4):
                 Change_emotions(ANGER, '-', 10);
-                //Change_emotions(ANGER, '+', 10);
                 cout << "ANGER: " << Hero.emotions[ANGER] << "\n"; // выводим как поменялась шкала из за ответа
+                cout.flush();
+                this_thread::sleep_for(std::chrono::milliseconds(800));
                 break;
             case(5):
                 Change_emotions(POWER, '+', 10);
-                //Change_emotions(POWER, '-', 10);
                 cout << "POWER: " << Hero.emotions[POWER] << "\n"; // выводим как поменялась шкала из за ответа
+                cout.flush();
+                this_thread::sleep_for(std::chrono::milliseconds(800));
                 break;
             case(6):
                 Change_emotions(CALM, '-', 10);
-                //Change_emotions(CALM, '+', 10);
                 cout << "CALM: " << Hero.emotions[CALM] << "\n"; // выводим как поменялась шкала из за ответа
+                cout.flush();
+                this_thread::sleep_for(std::chrono::milliseconds(800));
                 break;
             }
         }
