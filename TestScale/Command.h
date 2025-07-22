@@ -2,16 +2,16 @@
 
 #include "object.h"
 
-Worlds_Num get_opposite_world(Worlds_Num world) {
+Worlds_Num get_opposite_world(Worlds_Num world) { // принимает одну эмоцию а возвращает противоположную
 
     switch (world) {
-    case SADNESS: return JOY;
-    case JOY: return SADNESS;
-    case FEAR: return CALM;
-    case CALM: return FEAR;
-    case ANGER: return POWER;
-    case POWER: return ANGER;
-    default: return world;
+    case (SADNESS): return JOY;
+    case (JOY): return SADNESS;
+    case (FEAR): return CALM;
+    case (CALM): return FEAR;
+    case (ANGER): return POWER;
+    case (POWER): return ANGER;
+
     }
 }
 
