@@ -163,7 +163,7 @@ void Check_movement() {
                 }
             }
             else {
-                cout << ">> Миры " << Worlds_Names[i] << " и "
+                cout << ">> " << Worlds_Names[i] << " и "
                     << Worlds_Names[opposite_emotion] << " закрыты!\n";
             }
         }
@@ -188,14 +188,12 @@ void Change_emotions(Worlds_Num emotion,char math, int x) { // Изменяет 
     if (new_value < 0) new_value = 0; // Блокируем шкалы с новым значением, если шкала перешла за пределы 100 или 0
     if (new_value > 100) new_value = 100;
 
-    Hero.emotions[JOY] = 100 - Hero.emotions[emotion]; // Эмоции как переливающиеся сосуды
-    Hero.emotions[CALM] = 100 - Hero.emotions[emotion];
-    Hero.emotions[POWER] = 100 - Hero.emotions[emotion];
-
     Hero.emotions[emotion] = new_value; // а теперь записываем новое значение в эмоции игрока
 
-    // Проверка переходов только для эмоции текущего мира
-    if (emotion == Worlds[Hero.current_loc].linked_emotion) {
+    Worlds_Num opposite_emotion = get_opposite_world(emotion); // Эмоции как переливающиеся сосуды
+    Hero.emotions[opposite_emotion] = 100 - Hero.emotions[emotion];
+
+    if (emotion == Worlds[Hero.current_loc].linked_emotion) {  // Проверка переходов только для эмоции текущего мира
         Check_movement();
     }
 
