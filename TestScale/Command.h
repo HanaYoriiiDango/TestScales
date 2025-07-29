@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include "object.h"
-
 #include <thread>  // Для использования std::this_thread::sleep_for 
 #include <chrono>  // Для использования std::chrono::seconds 
 
@@ -31,7 +30,7 @@ Worlds_Num get_opposite_world(Worlds_Num world) { // принимает одну
 void Check_movement() {
 
     for (int i = 0; i < 6; i++) {     // Проверяем все эмоции на достижение предела
-        Worlds_Num emotion = static_cast<Worlds_Num>(i);
+        Worlds_Num emotion = static_cast<Worlds_Num>(i); 
         int emotion_value = Hero.emotions[i];
 
         if ((emotion_value <= 0 || emotion_value >= 100) && !Worlds[i].is_locked) {// Если эмоция достигла предела и её мир еще не заблокирован
@@ -39,7 +38,9 @@ void Check_movement() {
             Worlds[i].is_locked = true; // 1. Блокируем мир этой эмоции
 
             Worlds_Num opposite_emotion = get_opposite_world(emotion); // 2. Блокируем противоположный мир
-            Worlds[static_cast<int>(opposite_emotion)].is_locked = true;
+            //Worlds[static_cast<int>(opposite_emotion)].is_locked = true; статик не нужен, так как миры завязаны напрямую через enum
+            Worlds[opposite_emotion].is_locked = true;
+
 
             Hero.emotions[emotion] = 50; // 3. Сбрасываем эмоции
             Hero.emotions[opposite_emotion] = 50;
@@ -80,7 +81,7 @@ void Change_emotions(Worlds_Num emotion, char math, int x) { // Изменяет
         return;
     }
 
-    if (math != '+' && math != '-') return; // проверка на валидацию внутри кода
+    //if (math != '+' && math != '-') return; // проверка на валидацию внутри кода
 
     int new_value = Hero.emotions[emotion];
 
@@ -116,32 +117,26 @@ void Start_dialog() {
         int choice;
 
         NPC Ela("Ela");
-        Ela.text("Ты тут? (выбери 1 / 2..., 0 - exit) ", 60, 40, 60, 40, 60, 40);
+        Ela.text("Ты тут? (выбери 1 / 2..., 0 - exit) ");
         Ela.info();
 
         cout << "1) SADNESS (+10)" << endl; // 1
         cout.flush();
-        this_thread::sleep_for(std::chrono::milliseconds(650));
 
         cout << "2) JOY (-10)" << endl; // 2
         cout.flush();
-        this_thread::sleep_for(std::chrono::milliseconds(650));
 
         cout << "3) FEAR (+10)" << endl; // 3 
         cout.flush();
-        this_thread::sleep_for(std::chrono::milliseconds(650));
 
         cout << "4) ANGER (-10)" << endl; // 4
         cout.flush();
-        this_thread::sleep_for(std::chrono::milliseconds(650));
 
         cout << "5) POWER (+10)" << endl; // 5 
         cout.flush();
-        this_thread::sleep_for(std::chrono::milliseconds(650));
 
         cout << "6) CALM (-10)" << endl; // 6
         cout.flush();
-        this_thread::sleep_for(std::chrono::milliseconds(650));
 
         cin >> choice; // ожидаем ответа игрока на вопрос персонажа
 
