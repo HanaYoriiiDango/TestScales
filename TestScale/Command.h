@@ -61,6 +61,7 @@ void Check_movement() {
                         << " и " << Worlds_Names[opposite_emotion] << endl;
                 }
                 else {
+                    end_game = true;
                     cout << ">> Все миры закрыты! Игра завершена.\n";
                     // Завершение игры
                 }
@@ -78,6 +79,7 @@ void Change_emotions(Worlds_Num emotion, char math, int x) { // Изменяет
     // Здесь я решил дополнить функцию возможностью выбирать то, будет шкала уменьшаться или увеличиваться с помощью char math
 
     if (Worlds[static_cast<int>(emotion)].is_locked) {
+        cout << "Эмоция сдохла, несите новую \n" ;
         return;
     }
 
@@ -88,17 +90,20 @@ void Change_emotions(Worlds_Num emotion, char math, int x) { // Изменяет
     if (math == '+') new_value += x; // записываем новое значение для шкалы в переменную
     else new_value -= x; // записываем новое значение для шкалы в переменную
 
-    if (new_value < 0) new_value = 0; // Блокируем шкалы с новым значением, если шкала перешла за пределы 100 или 0
-    if (new_value > 100) new_value = 100;
+    if (new_value <= 0) new_value = 0; // Блокируем шкалы с новым значением, если шкала перешла за пределы 100 или 0
+    if (new_value >= 100) new_value = 100;
 
     Hero.emotions[emotion] = new_value; // а теперь записываем новое значение в эмоции игрока
 
     Worlds_Num opposite_emotion = get_opposite_world(emotion); // Эмоции как переливающиеся сосуды
     Hero.emotions[opposite_emotion] = 100 - Hero.emotions[emotion];
 
-    if (emotion == Worlds[Hero.current_loc].linked_emotion) {  // Проверка переходов только для эмоции текущего мира
-        Check_movement();
-    }
+    cout << Emotion_Names[(Worlds_Num)emotion] << ": " << Hero.emotions[emotion] << endl;
+
+
+    // dww
+     Check_movement();
+    
 
 }
 
@@ -106,7 +111,7 @@ void Start_dialog() {
 
     bool start = true; // переменная для завершения цикла диалога 
 
-    while (start) {
+    while (start && !end_game) {
 
         for (int i = 0; i < 6; i++) {
 
@@ -121,22 +126,11 @@ void Start_dialog() {
         Ela.info();
 
         cout << "1) SADNESS (+10)" << endl; // 1
-        cout.flush();
-
         cout << "2) JOY (-10)" << endl; // 2
-        cout.flush();
-
         cout << "3) FEAR (+10)" << endl; // 3 
-        cout.flush();
-
         cout << "4) ANGER (-10)" << endl; // 4
-        cout.flush();
-
         cout << "5) POWER (+10)" << endl; // 5 
-        cout.flush();
-
         cout << "6) CALM (-10)" << endl; // 6
-        cout.flush();
 
         cin >> choice; // ожидаем ответа игрока на вопрос персонажа
 
@@ -145,37 +139,31 @@ void Start_dialog() {
             switch (choice) {
             case(1):
                 Change_emotions(SADNESS, '+', 10);
-                cout << "Sadness: " << Hero.emotions[SADNESS] << "\n"; // выводим как поменялась шкала из за ответа
                 cout.flush();
                 this_thread::sleep_for(std::chrono::milliseconds(1000));
                 break;
             case(2):
-                Change_emotions(JOY, '-', 10);
-                cout << "Joy: " << Hero.emotions[JOY] << "\n"; // выводим как поменялась шкала из за ответа
+                Change_emotions(JOY, '+', 10);
                 cout.flush();
                 this_thread::sleep_for(std::chrono::milliseconds(1000));
                 break;
             case(3):
                 Change_emotions(FEAR, '+', 10);
-                cout << "FEAR: " << Hero.emotions[FEAR] << "\n"; // выводим как поменялась шкала из за ответа
                 cout.flush();
                 this_thread::sleep_for(std::chrono::milliseconds(1000));
                 break;
             case(4):
                 Change_emotions(ANGER, '-', 10);
-                cout << "ANGER: " << Hero.emotions[ANGER] << "\n"; // выводим как поменялась шкала из за ответа
                 cout.flush();
                 this_thread::sleep_for(std::chrono::milliseconds(1000));
                 break;
             case(5):
                 Change_emotions(POWER, '+', 10);
-                cout << "POWER: " << Hero.emotions[POWER] << "\n"; // выводим как поменялась шкала из за ответа
                 cout.flush();
                 this_thread::sleep_for(std::chrono::milliseconds(1000));
                 break;
             case(6):
                 Change_emotions(CALM, '-', 10);
-                cout << "CALM: " << Hero.emotions[CALM] << "\n"; // выводим как поменялась шкала из за ответа
                 cout.flush();
                 this_thread::sleep_for(std::chrono::milliseconds(1000));
                 break;
@@ -222,7 +210,7 @@ void Start_Game() {
 
     string temp; // переменная для ввода команд 
 
-    while (Hero.life) {
+    while (Hero.life && !end_game) {
 
         cout << "тут странности какие то происходят, все в огне \n";
         cout << "Go - для перемещения \n";

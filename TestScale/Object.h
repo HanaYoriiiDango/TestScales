@@ -18,17 +18,12 @@ using namespace std;
 enum Worlds_Num { SADNESS, JOY, FEAR, CALM, ANGER, POWER }; // инициализирую миры 
 string Emotion_Names[6] = { "Грусть", "Радость", "Страх", "Спокойствие", "Гнев", "Сила" }; // названия эмоций 
 string Worlds_Names[6] = { "Мир Грусти", "Мир Радости", "Мир Страха", "Мир Спокойствия", "Мир Гнева", "Мир Силы" }; // названия миров
+bool end_game = false;
 
 struct Portal_ { // структура для реализации перемещения между мирами посредством команды Go по порталам
     string name; // у портала есть имя, которое я смогу выводить в консоли для демонстрации выбора перемещения
     int target; // таргет играет ключеву роль, так как у каждого портала он свой и его можно легко приравнивать к текущему положению игрока (менять его положение)
     bool open = true; // это флаг который отвечате за то доступен мир игроку или нет
-
-};
-
-struct info { // вспомогательная структура для следующего класса
-
-    string dialog_Text; // здесь будет хранится реплеки персонажей
 
 };
 
@@ -58,9 +53,9 @@ public:
 
     void info() { // этот метод нужен чтобы непосредственно уже выводить имя персонажа и его реплику
 
-        textOut(name);
+        textOut(name); // выводим имя персонажа
 
-        cout << ": "; // выводим имя персонажа
+        cout << ": "; // Далее текст 
 
         for (int i = 0; i < letter.size(); i++) {
 
@@ -83,7 +78,7 @@ struct Location { // структура для реализации миров �
     string name; // у каждого мира есть свое имя 
     Worlds_Num linked_emotion;  // Какая эмоция связана с этим миром
     bool is_locked = false; // флаг для закрытия мира
-    vector<Portal_> portal; // векторный массив с типом данных прошлой структуры для привязки к мирам добавлен именно сюда
+    vector<Portal_> portal; // векторный массив с типом данных прошлой структуры для привязки к мирам
 
 };
 
@@ -95,6 +90,7 @@ void Init_Game() {
 
     // Создаю миры и порталы для них
     Worlds[SADNESS].name = "Мир Грусти";
+    Worlds[SADNESS].linked_emotion = SADNESS; 
     Worlds[SADNESS].portal.push_back({ "Мир Радости", JOY });
     Worlds[SADNESS].portal.push_back({ "Мир Страха", FEAR });
     Worlds[SADNESS].portal.push_back({ "Мир Спокойствия", CALM });
@@ -102,6 +98,7 @@ void Init_Game() {
     Worlds[SADNESS].portal.push_back({ "Мир Силы", POWER });
 
     Worlds[JOY].name = "Мир Радости";
+    Worlds[JOY].linked_emotion = JOY;
     Worlds[JOY].portal.push_back({ "Мир Грусти", SADNESS });
     Worlds[JOY].portal.push_back({ "Мир Страха", FEAR });
     Worlds[JOY].portal.push_back({ "Мир Спокойствия", CALM });
@@ -109,6 +106,7 @@ void Init_Game() {
     Worlds[JOY].portal.push_back({ "Мир Силы", POWER });
 
     Worlds[FEAR].name = "Мир Страха";
+    Worlds[FEAR].linked_emotion = FEAR;
     Worlds[FEAR].portal.push_back({ "Мир Грусти", SADNESS });
     Worlds[FEAR].portal.push_back({ "Мир Радости", JOY });
     Worlds[FEAR].portal.push_back({ "Мир Спокойствия", CALM });
@@ -116,6 +114,7 @@ void Init_Game() {
     Worlds[FEAR].portal.push_back({ "Мир Силы", POWER });
 
     Worlds[CALM].name = "Мир Спокойствия";
+    Worlds[CALM].linked_emotion = CALM;
     Worlds[CALM].portal.push_back({ "Мир Грусти", SADNESS });
     Worlds[CALM].portal.push_back({ "Мир Радости", JOY });
     Worlds[CALM].portal.push_back({ "Мир Страха", FEAR });
@@ -123,6 +122,7 @@ void Init_Game() {
     Worlds[CALM].portal.push_back({ "Мир Силы", POWER });
 
     Worlds[ANGER].name = "Мир Гнева";
+    Worlds[ANGER].linked_emotion = ANGER;
     Worlds[ANGER].portal.push_back({ "Мир Грусти", SADNESS });
     Worlds[ANGER].portal.push_back({ "Мир Радости", JOY });
     Worlds[ANGER].portal.push_back({ "Мир Страха", FEAR });
@@ -130,6 +130,7 @@ void Init_Game() {
     Worlds[ANGER].portal.push_back({ "Мир Силы", POWER });
 
     Worlds[POWER].name = "Мир Силы";
+    Worlds[POWER].linked_emotion = POWER;
     Worlds[POWER].portal.push_back({ "Мир Грусти", SADNESS });
     Worlds[POWER].portal.push_back({ "Мир Радости", JOY });
     Worlds[POWER].portal.push_back({ "Мир Страха", FEAR });
